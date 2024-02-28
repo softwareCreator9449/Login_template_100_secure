@@ -1,10 +1,10 @@
 <?php
-require '../includes/db_connect.php'; 
+require '../includes/db_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
-    $password = md5($_POST['password']); 
-    // Ejemplo -> INSERT INTO users (username, password) VALUES ('pedro', '1f8a558aa07de0d25c61e79f5d2ce1c3');
+    $password = md5($_POST['password']);
+
     $stmt = $conn->prepare("SELECT username FROM users WHERE username = ? AND password = ?");
     $stmt->bind_param("ss", $username, $password);
     $stmt->execute();
@@ -12,10 +12,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows > 0) {
         session_start();
+        $_SESSION['loggedin'] = true;
+        $_SESSION['username'] = $username;
         header("Location: /main"); 
         exit;
     } else {
+        $error = "Nombre de usuario o contraseña inválidos.";
+        header("Location: index.php?error=" . urlencode($error));
         exit;
     }
 }
 ?>
+
